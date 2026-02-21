@@ -72,6 +72,7 @@ export default function GlobalizeForm({
     }
 
     setIsSubmitting(true)
+    await new Promise((r) => setTimeout(r, 0))
     try {
       const res = await fetch('/api/jobs', {
         method: 'POST',
