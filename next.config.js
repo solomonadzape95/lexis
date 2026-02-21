@@ -1,6 +1,13 @@
+const path = require('path')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
+    // Ensure @ alias resolves in all environments (e.g. Docker build)
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname),
+    }
     // Suppress source map parsing errors for missing WASM files
     config.ignoreWarnings = [
       { module: /node_modules\/next\/dist\/compiled\/source-map/ },
