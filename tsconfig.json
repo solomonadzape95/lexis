@@ -16,7 +16,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "types": [
-      "node"
+      "node",
+      "next"
     ],
     "baseUrl": ".",
     "paths": {
@@ -36,6 +37,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [

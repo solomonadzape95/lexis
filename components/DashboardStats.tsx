@@ -14,7 +14,15 @@ export default function DashboardStats({ jobs }: Props) {
 
   const failedJobs = jobs.filter((job) => job.status === "failed").length;
 
-  const stats = [
+  const stats: Array<{
+    label: string;
+    value: string;
+    icon: string;
+    color: string;
+    bgColor: string;
+    trend?: string;
+    pulse?: boolean;
+  }> = [
     {
       label: "Total Translations",
       value: completedJobs.toLocaleString(),

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Icon from "@/components/Icon";
 import Loader from "@/components/Loader";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -116,13 +115,13 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
               {avatarUrl ? (
-                <Image
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   src={avatarUrl}
                   alt={username}
                   width={80}
                   height={80}
-                  className="rounded-full"
-                  unoptimized
+                  className="rounded-full w-20 h-20 object-cover"
                 />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold">

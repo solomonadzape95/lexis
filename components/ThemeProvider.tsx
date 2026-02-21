@@ -116,13 +116,20 @@ export function ThemeProvider({
     setAccentColorState(color)
   }, [])
 
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return <>{children}</>
-  }
+  // Always provide context so useTheme() works during SSR/prerender.
+  // When !mounted use initial values and no-op setters; after mount use real state.
+  const value =
+    !mounted
+      ? {
+          theme: initialTheme,
+          accentColor: initialAccentColor,
+          setTheme: () => {},
+          setAccentColor: () => {},
+        }
+      : { theme, accentColor, setTheme, setAccentColor }
 
   return (
-    <ThemeContext.Provider value={{ theme, accentColor, setTheme, setAccentColor }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )
