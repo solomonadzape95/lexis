@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Job } from "@/types";
 import { createBrowserClient } from "@/lib/supabase";
+import { useJobRealtime } from "./JobRealtimeProvider";
 import { getStepSummary } from "@/lib/stepSummary";
 import StepRow from "./StepRow";
 import ResultCard from "./ResultCard";
@@ -25,23 +26,40 @@ const STEPS = [
 ] as const;
 
 export default function JobProgress({ initialJob }: Props) {
-  const [job, setJob] = useState<Job>(initialJob);
+  const realtime = useJobRealtime();
+  const realtimeJob = realtime?.jobById[initialJob.id];
+
+  const [job, setJob] = useState<Job>(realtimeJob ?? initialJob);
   const [isStarting, setIsStarting] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const [hasHydrated, setHasHydrated] = useState(false);
 
+  // Sync with provider when it has newer data (e.g. we subscribed before navigation)
   useEffect(() => {
-    const supabase = createBrowserClient();
+    if (realtimeJob) setJob(realtimeJob);
+  }, [realtimeJob]);
+
+  // Only create our own Realtime subscription when the provider isn't subscribed to this job (e.g. direct load / refresh)
+  const useProviderSubscription = realtime?.subscribedJobId === initialJob.id;
+  useEffect(() => {
+    if (useProviderSubscription) return;
+
+    let supabase: ReturnType<typeof createBrowserClient>;
+    try {
+      supabase = createBrowserClient();
+    } catch {
+      return;
+    }
 
     const channel = supabase
-      .channel(`job-${job.id}`)
+      .channel(`job-${initialJob.id}`)
       .on(
         "postgres_changes",
         {
           event: "UPDATE",
           schema: "public",
           table: "jobs",
-          filter: `id=eq.${job.id}`,
+          filter: `id=eq.${initialJob.id}`,
         },
         (payload) => {
           setJob(payload.new as Job);
@@ -52,7 +70,7 @@ export default function JobProgress({ initialJob }: Props) {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [job.id]);
+  }, [initialJob.id, useProviderSubscription]);
 
   // One-time hydration to pick up logs/steps that may have been written
   // before this client subscribed to Realtime.
@@ -86,6 +104,27 @@ export default function JobProgress({ initialJob }: Props) {
 
     void hydrate();
   }, [job.id, job.logs, job.status, job.current_step, job.error, hasHydrated]);
+
+  // Delayed refetch: pipeline often starts before we land on this page, so the WebSocket
+  // may not be connected when early logs are written. Refetch once after a short delay
+  // to catch any logs we missed before the subscription was active.
+  useEffect(() => {
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/jobs/${job.id}`);
+        if (!res.ok) return;
+        const latest = (await res.json()) as Job;
+        setJob((prev) => {
+          const prevLogCount = (prev.logs ?? []).length;
+          const newLogCount = (latest.logs ?? []).length;
+          return newLogCount > prevLogCount ? latest : prev;
+        });
+      } catch {
+        // ignore
+      }
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [job.id]);
 
   const handleStart = useCallback(async () => {
     if (job.status !== "pending" || isStarting) return;

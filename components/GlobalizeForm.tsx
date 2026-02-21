@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useJobRealtime } from './JobRealtimeProvider'
 import LanguageSelector from './LanguageSelector'
 import RepoDetector from './RepoDetector'
 import Loader from './Loader'
@@ -34,6 +35,7 @@ export default function GlobalizeForm({
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
+  const realtime = useJobRealtime()
 
   // Fetch session to get GitHub token for RepoDetector if not provided
   useEffect(() => {
@@ -93,6 +95,7 @@ export default function GlobalizeForm({
       }
 
       const jobId = json.jobId
+      realtime?.subscribeToJob(jobId)
       onSuccess?.(jobId)
       router.push(`/jobs/${jobId}`)
     } catch (err) {

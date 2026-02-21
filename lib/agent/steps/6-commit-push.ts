@@ -153,6 +153,13 @@ export default async function commitPushStep(ctx: PipelineContext): Promise<void
 
   await git.add('.')
 
+  await git.raw(['config', 'user.name', githubUsername ?? forkOwner])
+  await git.raw([
+    'config',
+    'user.email',
+    githubUsername ? `${githubUsername}@users.noreply.github.com` : 'agent@lexis.app',
+  ])
+
   const author = githubUsername
     ? `${githubUsername} <${githubUsername}@users.noreply.github.com>`
     : `${forkOwner}[bot] <bot@example.com>`
