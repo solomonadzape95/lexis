@@ -4,6 +4,8 @@
 
 - **Paste URL** → **Globalize** → **Watch live progress** → **Open PR**
 
+**Live:** [lexis-kq5w.onrender.com](https://lexis-kq5w.onrender.com/dashboard) · **Demo:** [Watch on YouTube](https://youtu.be/Kos88AK53Ew)
+
 ---
 
 ## Tech stack
