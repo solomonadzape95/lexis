@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
     const cookies = response.cookies.getAll();
     console.log(
       "Setting cookies:",
-      cookies.map((c) => c.name),
+      cookies.map((c: { name: any; }) => c.name),
     );
 
     return response;
