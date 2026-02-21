@@ -85,7 +85,7 @@ export default async function HomePage() {
 
       {/* Footer */}
       <footer className="mt-auto py-8 sm:py-10 px-4 sm:px-6 border-t border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 text-center md:text-left">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4 sm:gap-6 text-center md:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
               Powered by
