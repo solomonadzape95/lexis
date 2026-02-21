@@ -44,6 +44,8 @@ const FRAMEWORK_DETECTORS: Array<{
     detect: (pkg, structure) => {
       const deps = { ...(pkg.dependencies as Record<string, string>), ...(pkg.devDependencies as Record<string, string>) }
       if (!deps.react) return null
+      // Don't list React separately when it's a Next.js app — Next.js (app-router) already implies React
+      if (deps.next && structure.hasAppDir) return null
 
       const hasVite = deps.vite || deps['@vitejs/plugin-react']
       const hasCRA = deps['react-scripts']
@@ -175,7 +177,7 @@ export async function detectFrameworks(
   repo: string,
   token: string,
 ): Promise<DetectedFramework[]> {
-  const octokit = new Octokit({ auth: token })
+  const octokit = new Octokit({ auth: token || undefined })
 
   try {
     // Get package.json content

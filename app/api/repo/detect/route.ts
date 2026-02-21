@@ -3,14 +3,6 @@ import { getSession } from '@/lib/supabase-server'
 import { detectFrameworks } from '@/lib/repo-detector'
 
 export async function POST(req: NextRequest) {
-  const session = await getSession()
-  if (!session || !session.providerToken) {
-    return NextResponse.json(
-      { error: 'Sign in required.' },
-      { status: 401 },
-    )
-  }
-
   const body = await req.json().catch(() => null)
   if (!body || typeof body.owner !== 'string' || typeof body.repo !== 'string') {
     return NextResponse.json(
@@ -19,11 +11,15 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  // Use GitHub token if signed in (better rate limits, private repos); otherwise public repos only
+  const session = await getSession()
+  const token = session?.providerToken ?? undefined
+
   try {
     const frameworks = await detectFrameworks(
       body.owner,
       body.repo,
-      session.providerToken,
+      token ?? '',
     )
 
     return NextResponse.json({ frameworks })

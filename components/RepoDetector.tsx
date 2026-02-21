@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { DetectedFramework } from '@/lib/repo-detector'
 import Icon from './Icon'
+import FrameworkIcon from './FrameworkIcon'
 
 type Props = {
   repoUrl: string
@@ -16,12 +17,13 @@ export default function RepoDetector({ repoUrl, githubToken, onDetected }: Props
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!repoUrl || !githubToken) {
+    if (!repoUrl?.trim()) {
       setFrameworks([])
       return
     }
 
-    const match = repoUrl.match(/github\.com\/(.+?)\/(.+?)(?:\.git)?(?:\/)?$/)
+    const normalized = repoUrl.trim().replace(/^https?:\/\//, '').split('?')[0]
+    const match = normalized.match(/github\.com\/([^/]+)\/([^/#]+?)(?:\.git)?(?:\/.*)?$/)
     if (!match) {
       setFrameworks([])
       return
@@ -84,32 +86,53 @@ export default function RepoDetector({ repoUrl, githubToken, onDetected }: Props
   return (
     <div className="space-y-2">
       {supportedFramework && (
-        <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-          <Icon name="check_circle" size={20} className="text-emerald-500" />
-          <div className="flex-1">
+        <div className="flex items-center gap-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-slate-800 shadow-sm ring-1 ring-emerald-500/20">
+            <FrameworkIcon
+              name={supportedFramework.name}
+              type={supportedFramework.type}
+              size={22}
+              className="[color:inherit]"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
             <div className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
               {supportedFramework.name}
-              {supportedFramework.type && ` (${supportedFramework.type})`}
+              {supportedFramework.type && supportedFramework.type !== 'unknown' && (
+                <span className="font-normal text-emerald-600 dark:text-emerald-500"> ({supportedFramework.type})</span>
+              )}
             </div>
-            <div className="text-xs text-emerald-600 dark:text-emerald-500">
-              Fully supported ✓
+            <div className="text-xs text-emerald-600 dark:text-emerald-500 mt-0.5">
+              Fully supported
             </div>
           </div>
+          <span className="shrink-0 rounded-full bg-emerald-500/20 p-1.5" aria-hidden>
+            <Icon name="check_circle" size={16} className="text-emerald-600 dark:text-emerald-400" />
+          </span>
         </div>
       )}
 
       {unsupportedFrameworks.map((framework) => (
         <div
           key={`${framework.name}-${framework.type}`}
-          className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+          className="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl"
         >
-          <Icon name="schedule" size={20} className="text-amber-500" />
-          <div className="flex-1">
-            <div className="text-sm font-bold text-amber-700 dark:text-amber-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-slate-800 shadow-sm ring-1 ring-slate-200 dark:ring-slate-600">
+            <FrameworkIcon
+              name={framework.name}
+              type={framework.type}
+              size={22}
+              className="text-slate-600 dark:text-slate-400"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-bold text-slate-700 dark:text-slate-300">
               {framework.name}
-              {framework.type && ` (${framework.type})`}
+              {framework.type && framework.type !== 'unknown' && (
+                <span className="font-normal text-slate-500 dark:text-slate-400"> ({framework.type})</span>
+              )}
             </div>
-            <div className="text-xs text-amber-600 dark:text-amber-500">
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {framework.supportLevel === 'coming-soon'
                 ? 'Coming soon'
                 : 'Not supported'}

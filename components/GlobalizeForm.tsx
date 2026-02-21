@@ -136,9 +136,9 @@ export default function GlobalizeForm({
           />
         </div>
         
-        {/* Repo Detector */}
-        {repoUrl && githubToken && (
-          <RepoDetector repoUrl={repoUrl} githubToken={githubToken} />
+        {/* Repo Detector – runs for any pasted URL (uses token if signed in for private repos) */}
+        {repoUrl?.trim() && (
+          <RepoDetector repoUrl={repoUrl.trim()} githubToken={githubToken} />
         )}
       </div>
 
