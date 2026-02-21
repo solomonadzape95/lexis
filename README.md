@@ -86,6 +86,8 @@ If Site URL or Redirect URLs stay as localhost, the browser will be sent to loca
 - **Railway / Render / Fly.io**: Deploy from the repo; if the platform builds from the Dockerfile, Git will be present. On Railway and Render you can select "Dockerfile" as the build option.
 - **Vercel**: The default serverless runtime does not include Git and cannot install it. Use one of the options above instead, or run only the frontend on Vercel and host the pipeline API elsewhere (e.g. a small Node server with Git).
 
+**NEXT_PUBLIC_* and Docker (e.g. Render):** Next.js inlines `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` into the client bundle **at build time**. If you only set them in Render’s Environment (runtime), the image was built without them, so the browser gets `undefined` and you see “Supabase environment variables aren’t configured.” Fix: make them available **during** the Docker build. On **Render**: use **Environment** → add the vars → then either (1) use **Docker** with **Build-time environment variables** / “Inject env into Docker build” if your plan supports it, or (2) build the image yourself with `docker build --build-arg NEXT_PUBLIC_SUPABASE_URL=... --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=... -t lexis .` and push to a registry, then deploy that image on Render. Names must be exactly `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
 ### Run
 
 ```bash
