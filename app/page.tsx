@@ -38,15 +38,6 @@ export default async function HomePage() {
       <main className="flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-8 sm:py-12 @container">
         {/* Hero Section */}
         <div className="max-w-4xl w-full text-center space-y-6 sm:space-y-8 mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full mb-4">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-            </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-primary">
-              v2.0 Autonomous Agent Active
-            </span>
-          </div>
           <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-tight tracking-[-0.04em] text-slate-900 dark:text-white">
             Globalize your Next.js <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">

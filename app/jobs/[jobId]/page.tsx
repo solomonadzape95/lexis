@@ -69,9 +69,7 @@ export default async function JobPage({ params }: PageParams) {
                 <h1 className="text-base sm:text-lg font-bold leading-tight tracking-tight dark:text-white truncate">
                   Lexis
                 </h1>
-                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
-                  v2.4.0-beta
-                </p>
+               
               </div>
             </div>
           </div>
