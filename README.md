@@ -76,6 +76,16 @@ NEXT_PUBLIC_BASE_URL=https://your-domain.com
 
 If Site URL or Redirect URLs stay as localhost, the browser will be sent to localhost after GitHub sign-in and the connection will fail in production.
 
+**Git required for the pipeline:** The agent clones and pushes repos using the system `git` binary. To ensure Git exists in production:
+
+- **Use the included Dockerfile** (recommended): It uses a Node image and installs `git`. Build and run the image on any Docker host (Railway, Fly.io, Render, AWS ECS, etc.):
+  ```bash
+  docker build -t lexis .
+  docker run -p 3000:3000 --env-file .env lexis
+  ```
+- **Railway / Render / Fly.io**: Deploy from the repo; if the platform builds from the Dockerfile, Git will be present. On Railway and Render you can select "Dockerfile" as the build option.
+- **Vercel**: The default serverless runtime does not include Git and cannot install it. Use one of the options above instead, or run only the frontend on Vercel and host the pipeline API elsewhere (e.g. a small Node server with Git).
+
 ### Run
 
 ```bash

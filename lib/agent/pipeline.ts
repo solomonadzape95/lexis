@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Job, JobStats } from '../../types'
 import type { PipelineContext, PipelineStep, PipelineStepName } from './types'
 import { log, setCurrentStep, setStatus } from './logger'
+import { ensureGitAvailable } from './check-git'
 import cloneStep from './steps/1-clone'
 import scanStep from './steps/2-scan'
 import setupI18nStep from './steps/3-setup-i18n'
@@ -59,6 +60,8 @@ export async function runPipeline(
   if (!supabaseUrl || !supabaseServiceRoleKey) {
     throw new Error('Supabase environment variables are not configured.')
   }
+
+  await ensureGitAvailable()
 
   const token = options?.githubToken ?? process.env.GITHUB_TOKEN
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
