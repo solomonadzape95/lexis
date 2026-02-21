@@ -7,7 +7,7 @@ import Loader from "@/components/Loader";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useTheme } from "@/components/ThemeProvider";
 import { ALL_LANGUAGES } from "@/lib/languages";
-import type { UserProfile } from "@/app/api/profile/route";
+import type { UserProfile } from "@/app/api/jobs/profile/route";
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
 
@@ -78,7 +78,9 @@ export default function ProfilePage() {
           <main className="flex-1 overflow-y-auto flex items-center justify-center">
             <div className="text-center">
               <Loader className="mx-auto mb-4" />
-              <p className="text-slate-500 dark:text-slate-400">Loading profile...</p>
+              <p className="text-slate-500 dark:text-slate-400">
+                Loading profile...
+              </p>
             </div>
           </main>
         </div>
@@ -109,127 +111,127 @@ export default function ProfilePage() {
               </h1>
             </div>
 
-        {/* Profile Card */}
-        <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-8 space-y-6 sm:space-y-8">
-          {/* Avatar and Display Name */}
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
-              {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={avatarUrl}
-                  alt={username}
-                  width={80}
-                  height={80}
-                  className="rounded-full w-20 h-20 object-cover"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold">
-                  {username.charAt(0).toUpperCase()}
+            {/* Profile Card */}
+            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-8 space-y-6 sm:space-y-8">
+              {/* Avatar and Display Name */}
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={avatarUrl}
+                      alt={username}
+                      width={80}
+                      height={80}
+                      className="rounded-full w-20 h-20 object-cover"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold">
+                      {username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 block">
+                      Display Name
+                    </label>
+                    <input
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900 dark:text-white"
+                      placeholder="Your name"
+                    />
+                  </div>
                 </div>
-              )}
-              <div className="flex-1">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 block">
-                  Display Name
+              </div>
+
+              {/* Theme Selection */}
+              <div className="space-y-4">
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  Theme
                 </label>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  {(["light", "dark", "system"] as const).map((themeOption) => (
+                    <button
+                      key={themeOption}
+                      type="button"
+                      onClick={() => setTheme(themeOption)}
+                      className={`flex-1 px-4 py-3 rounded-xl border-2 transition-all ${
+                        theme === themeOption
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                      }`}
+                    >
+                      <div className="font-bold capitalize">{themeOption}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        {themeOption === "system"
+                          ? "Follow OS"
+                          : themeOption === "light"
+                            ? "Light mode"
+                            : "Dark mode"}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Default Language */}
+              <div className="space-y-4">
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  Default Language
+                </label>
+                <select
+                  value={defaultLanguage}
+                  onChange={(e) => setDefaultLanguage(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900 dark:text-white"
-                  placeholder="Your name"
+                >
+                  {ALL_LANGUAGES.map((lang) => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.flag} {lang.name}{" "}
+                      {lang.nativeName && `(${lang.nativeName})`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Preferred Languages */}
+              <div className="space-y-4">
+                <LanguageSelector
+                  name="preferred_languages"
+                  defaultSelected={preferredLanguages}
+                  onChange={setPreferredLanguages}
                 />
               </div>
-            </div>
-          </div>
 
-          {/* Theme Selection */}
-          <div className="space-y-4">
-            <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-              Theme
-            </label>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              {(["light", "dark", "system"] as const).map((themeOption) => (
+              {/* Save Button */}
+              <div className="flex justify-end gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
                 <button
-                  key={themeOption}
                   type="button"
-                  onClick={() => setTheme(themeOption)}
-                  className={`flex-1 px-4 py-3 rounded-xl border-2 transition-all ${
-                    theme === themeOption
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                  }`}
+                  onClick={() => router.back()}
+                  className="px-6 py-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium"
                 >
-                  <div className="font-bold capitalize">{themeOption}</div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    {themeOption === "system"
-                      ? "Follow OS"
-                      : themeOption === "light"
-                        ? "Light mode"
-                        : "Dark mode"}
-                  </div>
+                  Cancel
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold shadow-lg shadow-primary/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {saving ? (
+                    <>
+                      <Loader size="sm" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="check_circle" size={18} />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Default Language */}
-          <div className="space-y-4">
-            <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-              Default Language
-            </label>
-            <select
-              value={defaultLanguage}
-              onChange={(e) => setDefaultLanguage(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900 dark:text-white"
-            >
-              {ALL_LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code}>
-                  {lang.flag} {lang.name}{" "}
-                  {lang.nativeName && `(${lang.nativeName})`}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Preferred Languages */}
-          <div className="space-y-4">
-            <LanguageSelector
-              name="preferred_languages"
-              defaultSelected={preferredLanguages}
-              onChange={setPreferredLanguages}
-            />
-          </div>
-
-          {/* Save Button */}
-          <div className="flex justify-end gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving}
-              className="px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold shadow-lg shadow-primary/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {saving ? (
-                <>
-                  <Loader size="sm" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Icon name="check_circle" size={18} />
-                  Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </div>
           </div>
         </main>
       </div>

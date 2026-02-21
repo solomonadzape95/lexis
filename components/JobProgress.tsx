@@ -39,11 +39,8 @@ export default function JobProgress({ initialJob }: Props) {
     if (realtimeJob) setJob(realtimeJob);
   }, [realtimeJob]);
 
-  // Only create our own Realtime subscription when the provider isn't subscribed to this job (e.g. direct load / refresh)
-  const useProviderSubscription = realtime?.subscribedJobId === initialJob.id;
+  // Always create our own Realtime subscription so we get updates even if the provider failed (e.g. missing env)
   useEffect(() => {
-    if (useProviderSubscription) return;
-
     let supabase: ReturnType<typeof createBrowserClient>;
     try {
       supabase = createBrowserClient();
@@ -70,7 +67,22 @@ export default function JobProgress({ initialJob }: Props) {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [initialJob.id, useProviderSubscription]);
+  }, [initialJob.id]);
+
+  const fetchLatest = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/jobs/${initialJob.id}`);
+      if (!res.ok) return;
+      const latest = (await res.json()) as Job;
+      setJob((prev) => {
+        const prevLogCount = (prev.logs ?? []).length;
+        const newLogCount = (latest.logs ?? []).length;
+        return newLogCount > prevLogCount ? latest : prev;
+      });
+    } catch {
+      // ignore
+    }
+  }, [initialJob.id]);
 
   // One-time hydration to pick up logs/steps that may have been written
   // before this client subscribed to Realtime.
@@ -105,26 +117,18 @@ export default function JobProgress({ initialJob }: Props) {
     void hydrate();
   }, [job.id, job.logs, job.status, job.current_step, job.error, hasHydrated]);
 
-  // Delayed refetch: pipeline often starts before we land on this page, so the WebSocket
-  // may not be connected when early logs are written. Refetch once after a short delay
-  // to catch any logs we missed before the subscription was active.
+  // Delayed refetch: pipeline often starts before we land on this page. Refetch once to catch early logs.
   useEffect(() => {
-    const t = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/jobs/${job.id}`);
-        if (!res.ok) return;
-        const latest = (await res.json()) as Job;
-        setJob((prev) => {
-          const prevLogCount = (prev.logs ?? []).length;
-          const newLogCount = (latest.logs ?? []).length;
-          return newLogCount > prevLogCount ? latest : prev;
-        });
-      } catch {
-        // ignore
-      }
-    }, 2000);
+    const t = setTimeout(fetchLatest, 1500);
     return () => clearTimeout(t);
-  }, [job.id]);
+  }, [fetchLatest]);
+
+  // Poll while running so logs show even if Realtime is broken (e.g. env, Supabase config).
+  useEffect(() => {
+    if (job.status !== "running") return;
+    const interval = setInterval(fetchLatest, 2500);
+    return () => clearInterval(interval);
+  }, [job.status, fetchLatest]);
 
   const handleStart = useCallback(async () => {
     if (job.status !== "pending" || isStarting) return;
