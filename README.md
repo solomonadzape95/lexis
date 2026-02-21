@@ -58,6 +58,24 @@ LINGODOTDEV_API_KEY=
 
 Apply migrations in the Supabase dashboard (or via CLI) from `supabase/migrations/`.
 
+#### Deployment (production)
+
+Set these so sign-in and callbacks never redirect to localhost:
+
+```bash
+# Your app’s public URL (required for OAuth redirects)
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+# Optional: same idea for server-side fetch (Vercel sets VERCEL_URL automatically)
+NEXT_PUBLIC_BASE_URL=https://your-domain.com
+```
+
+**Supabase (Authentication → URL Configuration):**
+
+- **Site URL**: set to your production URL (e.g. `https://your-domain.com`), not `http://localhost:3000`.
+- **Redirect URLs**: add your callback, e.g. `https://your-domain.com/auth/callback`.
+
+If Site URL or Redirect URLs stay as localhost, the browser will be sent to localhost after GitHub sign-in and the connection will fail in production.
+
 ### Run
 
 ```bash

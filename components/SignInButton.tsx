@@ -7,8 +7,11 @@ export default function SignInButton() {
   async function handleSignIn() {
     try {
       const supabase = createBrowserClient();
+      // Use NEXT_PUBLIC_APP_URL in production so redirect never goes to localhost
       const origin =
-        typeof window !== "undefined" ? window.location.origin : "";
+        typeof window !== "undefined"
+          ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
+          : process.env.NEXT_PUBLIC_APP_URL || "";
       const redirectTo = `${origin}/auth/callback`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
