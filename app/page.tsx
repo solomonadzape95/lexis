@@ -92,7 +92,7 @@ export default async function HomePage() {
             </span>
             <div className="flex items-center gap-6 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all">
               <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
-                <span className="bg-primary h-4 w-4 rounded-full" />
+                <span className="bg-green-500 h-4 w-4 rounded-full" />
                 Lingo.dev
               </div>
               <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
@@ -100,20 +100,6 @@ export default async function HomePage() {
                 Gemini
               </div>
             </div>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm text-slate-500">
-            <Link href="#" className="hover:text-primary transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
-              Terms of Service
-            </Link>
-            <Link href="#" className="hover:text-primary transition-colors">
-              Contact
-            </Link>
-          </div>
-          <div className="text-slate-400 text-sm">
-            © 2024 Lexis. All rights reserved.
           </div>
         </div>
       </footer>
