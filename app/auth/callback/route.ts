@@ -10,9 +10,12 @@ export async function GET(req: NextRequest) {
   const code = requestUrl.searchParams.get("code");
   const next = requestUrl.searchParams.get("next") ?? "/";
 
+  // Use app URL from env when behind a proxy (e.g. Render internal port); avoid redirecting to localhost:10000
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
+
   if (code) {
     // Construct absolute redirect URL
-    const redirectUrl = new URL(next, requestUrl.origin);
+    const redirectUrl = new URL(next, baseUrl);
 
     // Create a response object that can set cookies
     const response = NextResponse.redirect(redirectUrl);
@@ -42,7 +45,7 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error("Auth callback error:", error);
-      return NextResponse.redirect(new URL("/?error=auth", requestUrl.origin));
+      return NextResponse.redirect(new URL("/?error=auth", baseUrl));
     }
 
     // Fetch GitHub user data and store avatar URL
@@ -102,5 +105,5 @@ export async function GET(req: NextRequest) {
     return response;
   }
 
-  return NextResponse.redirect(new URL("/?error=no_code", requestUrl.origin));
+  return NextResponse.redirect(new URL("/?error=no_code", baseUrl));
 }
